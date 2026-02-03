@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>学習時間記録システム</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap');
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+      font-family: 'Outfit', -apple-system, sans-serif;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      color: white;
+      animation: slideIn 0.5s ease-out;
+    }
+    
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin: 0 0 10px 0;
+      text-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+    
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 1.8rem;
+      }
+    }
+    
+    .header p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      margin: 0;
+    }
+    
+    @media (max-width: 768px) {
+      .header p {
+        font-size: 1rem;
+      }
+    }
+    
+    .control-buttons {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    
+    .btn-primary {
+      padding: 20px 60px;
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+    
+    @media (max-width: 768px) {
+      .btn-primary {
+        padding: 15px 40px;
+        font-size: 1.2rem;
+      }
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+    }
+    
+    .btn-primary.recording {
+      background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+      color: #333;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 30px;
+      padding: 40px;
+      margin-bottom: 40px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      animation: slideIn 0.5s ease-out;
+    }
+    
+    @media (max-width: 768px) {
+      .card {
+        padding: 20px;
+        border-radius: 20px;
+      }
+    }
+    
+    .card h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #667eea;
+      margin-top: 0;
+      margin-bottom: 30px;
+    }
+    
+    @media (max-width: 768px) {
+      .card h2 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+      }
+    }
+    
+    .form-group {
+      margin-bottom: 25px;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: 15px;
+    }
+    
+    @media (max-width: 768px) {
+      .btn-group {
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+    
+    .btn-toggle {
+      flex: 1;
+      padding: 15px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      background: #e0e0e0;
+      color: #666;
+    }
+    
+    @media (max-width: 768px) {
+      .btn-toggle {
+        font-size: 1rem;
+        padding: 12px;
+      }
+    }
+    
+    .btn-toggle.active {
+      background: #667eea;
+      color: white;
+    }
+    
+    .btn-toggle.team2.active {
+      background: #764ba2;
+    }
+    
+    .btn-toggle.mode.active {
+      background: #f093fb;
+    }
+    
+    .form-input, .form-select {
+      width: 100%;
+      padding: 15px;
+      font-size: 1.1rem;
+      border: 2px solid #667eea;
+      border-radius: 15px;
+      font-family: inherit;
+    }
+    
+    @media (max-width: 768px) {
+      .form-input, .form-select {
+        font-size: 1rem;
+        padding: 12px;
+      }
+    }
+    
+    .btn-add {
+      width: 100%;
+      padding: 20px;
+      font-size: 1.3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      font-family: inherit;
+    }
+    
+    @media (max-width: 768px) {
+      .btn-add {
+        font-size: 1.1rem;
+        padding: 15px;
+      }
+    }
+    
+    .btn-add:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
+    
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+    
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+    }
+    
+    .card h3 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+    
+    @media (max-width: 768px) {
+      .card h3 {
+        font-size: 1.3rem;
+      }
+    }
+    
+    .chart-container {
+      width: 100%;
+      height: 300px;
+      position: relative;
+    }
+    
+    .chart-bars {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      height: 250px;
+      padding: 20px 0;
+    }
+    
+    .chart-bar {
+      flex: 1;
+      max-width: 150px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .bar {
+      width: 80%;
+      background: linear-gradient(to top, #3b82f6, #60a5fa);
+      border-radius: 10px 10px 0 0;
+      transition: all 0.5s ease;
+      position: relative;
+      min-height: 10px;
+    }
+    
+    .bar.team2 {
+      background: linear-gradient(to top, #ef4444, #f87171);
+    }
+    
+    .bar-value {
+      position: absolute;
+      top: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #333;
+    }
+    
+    .bar-label {
+      font-weight: 600;
+      color: #666;
+      font-size: 0.9rem;
+    }
+    
+    .team-totals {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 20px;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+    
+    @media (max-width: 768px) {
+      .team-totals {
+        font-size: 1rem;
+      }
+    }
+    
+    .ranking-list {
+      max-height: 400px;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    
+    .ranking-list::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .ranking-list::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    
+    .ranking-list::-webkit-scrollbar-thumb {
+      background: #667eea;
+      border-radius: 10px;
+    }
+    
+    .ranking-list::-webkit-scrollbar-thumb:hover {
+      background: #764ba2;
+    }
+    
+    .ranking-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      margin-bottom: 10px;
+      background: #f5f5f5;
+      border-radius: 15px;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    
+    @media (max-width: 768px) {
+      .ranking-item {
+        font-size: 1rem;
+        padding: 12px 15px;
+      }
+    }
+    
+    .ranking-item.top3 {
+      background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+      box-shadow: 0 4px 15px rgba(253,203,110,0.4);
+    }
+    
+    .ranking-rank {
+      font-size: 1.3rem;
+      margin-right: 10px;
+    }
+    
+    .ranking-time {
+      color: #667eea;
+    }
+    
+    .session-item {
+      padding: 20px;
+      margin-bottom: 15px;
+      background: #f8f9fa;
+      border-radius: 15px;
+      border-left: 5px solid #667eea;
+    }
+    
+    @media (max-width: 768px) {
+      .session-item {
+        padding: 15px;
+      }
+    }
+    
+    .session-date {
+      font-size: 0.9rem;
+      color: #999;
+      margin-bottom: 10px;
+    }
+    
+    .session-totals {
+      display: flex;
+      gap: 20px;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    
+    @media (max-width: 768px) {
+      .session-totals {
+        font-size: 1rem;
+        gap: 15px;
+        flex-direction: column;
+      }
+    }
+    
+    .member-management {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    
+    @media (max-width: 768px) {
+      .member-management {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .team-section h4 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+    
+    @media (max-width: 768px) {
+      .team-section h4 {
+        font-size: 1.1rem;
+      }
+    }
+    
+    .member-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 15px;
+      margin-bottom: 10px;
+      background: #f8f9fa;
+      border-radius: 10px;
+    }
+    
+    .member-item.team1 {
+      border-left: 4px solid #3b82f6;
+    }
+    
+    .member-item.team2 {
+      border-left: 4px solid #ef4444;
+    }
+    
+    .member-name {
+      font-size: 1rem;
+      font-weight: 500;
+    }
+    
+    @media (max-width: 768px) {
+      .member-name {
+        font-size: 0.9rem;
+      }
+    }
+    
+    .btn-delete {
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      background: #ff6b6b;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-delete:hover {
+      background: #ff5252;
+    }
+    
+    @media (max-width: 768px) {
+      .btn-delete {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+      }
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    .empty-state {
+      text-align: center;
+      color: #999;
+      font-size: 1.1rem;
+      padding: 20px;
+    }
+    
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- ヘッダー -->
+    <div class="header">
+      <h1>学習時間記録システム</h1>
+      <p>Team Battle Study Tracker</p>
+    </div>
+
+    <!-- 記録開始/終了ボタン -->
+    <div class="control-buttons">
+      <button id="toggleRecording" class="btn-primary">🚀 記録開始</button>
+    </div>
+
+    <!-- 記録フォーム -->
+    <div id="recordingForm" class="card hidden">
+      <h2>📝 学習時間を記録</h2>
+      
+      <!-- チーム選択 -->
+      <div class="form-group">
+        <label class="form-label">チーム選択</label>
+        <div class="btn-group">
+          <button class="btn-toggle active" data-team="team1">第1チーム</button>
+          <button class="btn-toggle team2" data-team="team2">第2チーム</button>
+        </div>
+      </div>
+
+      <!-- 入力モード選択 -->
+      <div class="form-group">
+        <label class="form-label">メンバー選択方法</label>
+        <div class="btn-group">
+          <button class="btn-toggle mode active" data-mode="select">既存メンバー選択</button>
+          <button class="btn-toggle mode" data-mode="new">新規メンバー追加</button>
+        </div>
+      </div>
+
+      <!-- メンバー選択/入力 -->
+      <div class="form-group">
+        <label class="form-label" id="memberLabel">メンバーを選択</label>
+        <select id="memberSelect" class="form-select">
+          <option value="">選択してください</option>
+        </select>
+        <input type="text" id="memberInput" class="form-input hidden" placeholder="メンバー名を入力">
+      </div>
+
+      <!-- 学習時間入力 -->
+      <div class="form-group">
+        <label class="form-label">学習時間(分)</label>
+        <input type="number" id="studyTime" class="form-input" placeholder="例: 30" min="1">
+      </div>
+
+      <!-- 記録追加ボタン -->
+      <button id="addRecord" class="btn-add">📝 記録を追加</button>
+    </div>
+
+    <!-- グラフとランキング -->
+    <div class="grid">
+      <!-- チーム合計グラフ -->
+      <div class="card">
+        <h3 style="color: #667eea;">📊 チーム別合計時間</h3>
+        <div class="chart-container">
+          <div class="chart-bars">
+            <div class="chart-bar">
+              <div class="bar" id="bar1" style="height: 10px;">
+                <span class="bar-value" id="value1">0分</span>
+              </div>
+              <div class="bar-label">第1チーム</div>
+            </div>
+            <div class="chart-bar">
+              <div class="bar team2" id="bar2" style="height: 10px;">
+                <span class="bar-value" id="value2">0分</span>
+              </div>
+              <div class="bar-label">第2チーム</div>
+            </div>
+          </div>
+        </div>
+        <div class="team-totals">
+          <div style="color: #3b82f6;">第1: <span id="total1">0</span>分</div>
+          <div style="color: #ef4444;">第2: <span id="total2">0</span>分</div>
+        </div>
+      </div>
+
+      <!-- 個人ランキング -->
+      <div class="card">
+        <h3 style="color: #764ba2;">🏆 個人ランキング</h3>
+        <div class="ranking-list" id="rankingList">
+          <p class="empty-state">まだ記録がありません</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 過去のセッション -->
+    <div id="sessionsCard" class="card hidden">
+      <h3 style="color: #f093fb;">📚 過去の記録セッション</h3>
+      <div id="sessionsList"></div>
+    </div>
+
+    <!-- メンバー管理 -->
+    <div id="memberManagement" class="card hidden">
+      <h3 style="color: #667eea;">👥 登録メンバー管理</h3>
+      <div class="member-management">
+        <!-- 第1チーム -->
+        <div class="team-section">
+          <h4 style="color: #3b82f6;">第1チーム</h4>
+          <div id="team1List"></div>
+        </div>
+        <!-- 第2チーム -->
+        <div class="team-section">
+          <h4 style="color: #ef4444;">第2チーム</h4>
+          <div id="team2List"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // データ管理
+    let isRecording = false;
+    let selectedTeam = 'team1';
+    let inputMode = 'select';
+    let allMembers = [];
+    let currentSession = { team1Members: [], team2Members: [] };
+    let sessions = [];
+
+    // ローカルストレージから読み込み
+    function loadData() {
+      const saved = localStorage.getItem('studyTrackerData');
+      if (saved) {
+        const data = JSON.parse(saved);
+        allMembers = data.allMembers || [];
+        sessions = data.sessions || [];
+        currentSession = data.currentSession || { team1Members: [], team2Members: [] };
+        isRecording = data.isRecording || false;
+      }
+    }
+
+    // ローカルストレージに保存
+    function saveData() {
+      const data = {
+        allMembers,
+        sessions,
+        currentSession,
+        isRecording
+      };
+      localStorage.setItem('studyTrackerData', JSON.stringify(data));
+    }
+
+    // 初期化
+    loadData();
+    updateUI();
+
+    // UIの更新
+    function updateUI() {
+      // 記録ボタンの状態
+      const toggleBtn = document.getElementById('toggleRecording');
+      const recordingForm = document.getElementById('recordingForm');
+      
+      if (isRecording) {
+        toggleBtn.textContent = '⏹️ 記録終了';
+        toggleBtn.classList.add('recording');
+        recordingForm.classList.remove('hidden');
+      } else {
+        toggleBtn.textContent = '🚀 記録開始';
+        toggleBtn.classList.remove('recording');
+        recordingForm.classList.add('hidden');
+      }
+
+      // メンバーセレクトの更新
+      updateMemberSelect();
+
+      // グラフの更新
+      updateChart();
+
+      // ランキングの更新
+      updateRanking();
+
+      // セッション履歴の更新
+      updateSessions();
+
+      // メンバー管理の更新
+      updateMemberManagement();
+    }
+
+    // メンバー選択肢の更新
+    function updateMemberSelect() {
+      const select = document.getElementById('memberSelect');
+      const teamMembers = allMembers.filter(m => m.team === selectedTeam);
+      
+      select.innerHTML = '<option value="">選択してください</option>';
+      teamMembers.forEach(member => {
+        const option = document.createElement('option');
+        option.value = member.name;
+        option.textContent = member.name;
+        select.appendChild(option);
+      });
+    }
+
+    // グラフの更新
+    function updateChart() {
+      const team1Total = currentSession.team1Members.reduce((sum, m) => sum + m.time, 0);
+      const team2Total = currentSession.team2Members.reduce((sum, m) => sum + m.time, 0);
+      const maxTotal = Math.max(team1Total, team2Total, 1);
+
+      const bar1 = document.getElementById('bar1');
+      const bar2 = document.getElementById('bar2');
+      const value1 = document.getElementById('value1');
+      const value2 = document.getElementById('value2');
+      const total1 = document.getElementById('total1');
+      const total2 = document.getElementById('total2');
+
+      const height1 = Math.max((team1Total / maxTotal) * 200, 10);
+      const height2 = Math.max((team2Total / maxTotal) * 200, 10);
+
+      bar1.style.height = height1 + 'px';
+      bar2.style.height = height2 + 'px';
+
+      value1.textContent = team1Total + '分';
+      value2.textContent = team2Total + '分';
+      total1.textContent = team1Total;
+      total2.textContent = team2Total;
+    }
+
+    // ランキングの更新
+    function updateRanking() {
+      const allCurrentMembers = [...currentSession.team1Members, ...currentSession.team2Members];
+      const ranking = allCurrentMembers.sort((a, b) => b.time - a.time);
+      const rankingList = document.getElementById('rankingList');
+
+      if (ranking.length === 0) {
+        rankingList.innerHTML = '<p class="empty-state">まだ記録がありません</p>';
+        return;
+      }
+
+      rankingList.innerHTML = '';
+      ranking.forEach((member, idx) => {
+        const item = document.createElement('div');
+        item.className = 'ranking-item' + (idx < 3 ? ' top3' : '');
+        
+        const rankIcon = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `${idx + 1}位`;
+        
+        item.innerHTML = `
+          <div>
+            <span class="ranking-rank">${rankIcon}</span>
+            ${member.name}
+          </div>
+          <div class="ranking-time">${member.time}分</div>
+        `;
+        rankingList.appendChild(item);
+      });
+    }
+
+    // セッション履歴の更新
+    function updateSessions() {
+      const sessionsCard = document.getElementById('sessionsCard');
+      const sessionsList = document.getElementById('sessionsList');
+
+      if (sessions.length === 0) {
+        sessionsCard.classList.add('hidden');
+        return;
+      }
+
+      sessionsCard.classList.remove('hidden');
+      sessionsList.innerHTML = '';
+
+      sessions.forEach(session => {
+        const team1Total = session.team1Members.reduce((sum, m) => sum + m.time, 0);
+        const team2Total = session.team2Members.reduce((sum, m) => sum + m.time, 0);
+        
+        const item = document.createElement('div');
+        item.className = 'session-item';
+        item.innerHTML = `
+          <div class="session-date">${new Date(session.timestamp).toLocaleString('ja-JP')}</div>
+          <div class="session-totals">
+            <div style="color: #3b82f6;">第1チーム: ${team1Total}分</div>
+            <div style="color: #ef4444;">第2チーム: ${team2Total}分</div>
+          </div>
+        `;
+        sessionsList.appendChild(item);
+      });
+    }
+
+    // メンバー管理の更新
+    function updateMemberManagement() {
+      const memberManagement = document.getElementById('memberManagement');
+      const team1List = document.getElementById('team1List');
+      const team2List = document.getElementById('team2List');
+
+      if (allMembers.length === 0) {
+        memberManagement.classList.add('hidden');
+        return;
+      }
+
+      memberManagement.classList.remove('hidden');
+
+      const team1Members = allMembers.filter(m => m.team === 'team1');
+      const team2Members = allMembers.filter(m => m.team === 'team2');
+
+      // 第1チーム
+      if (team1Members.length === 0) {
+        team1List.innerHTML = '<p class="empty-state">メンバーなし</p>';
+      } else {
+        team1List.innerHTML = '';
+        team1Members.forEach(member => {
+          const item = document.createElement('div');
+          item.className = 'member-item team1';
+          item.innerHTML = `
+            <span class="member-name">${member.name}</span>
+            <button class="btn-delete" onclick="deleteMember('${member.name}')">削除</button>
+          `;
+          team1List.appendChild(item);
+        });
+      }
+
+      // 第2チーム
+      if (team2Members.length === 0) {
+        team2List.innerHTML = '<p class="empty-state">メンバーなし</p>';
+      } else {
+        team2List.innerHTML = '';
+        team2Members.forEach(member => {
+          const item = document.createElement('div');
+          item.className = 'member-item team2';
+          item.innerHTML = `
+            <span class="member-name">${member.name}</span>
+            <button class="btn-delete" onclick="deleteMember('${member.name}')">削除</button>
+          `;
+          team2List.appendChild(item);
+        });
+      }
+    }
+
+    // メンバー削除
+    function deleteMember(memberName) {
+      if (!confirm(`${memberName}を削除しますか?`)) {
+        return;
+      }
+
+      // allMembersから削除
+      allMembers = allMembers.filter(m => m.name !== memberName);
+
+      // 現在のセッションから削除
+      currentSession.team1Members = currentSession.team1Members.filter(m => m.name !== memberName);
+      currentSession.team2Members = currentSession.team2Members.filter(m => m.name !== memberName);
+
+      saveData();
+      updateUI();
+    }
+
+    // グローバルスコープに公開
+    window.deleteMember = deleteMember;
+
+    // イベントリスナー
+    document.getElementById('toggleRecording').addEventListener('click', () => {
+      if (isRecording) {
+        // 記録終了
+        isRecording = false;
+        sessions.push({
+          ...currentSession,
+          timestamp: new Date().toISOString()
+        });
+        currentSession = { team1Members: [], team2Members: [] };
+      } else {
+        // 記録開始
+        isRecording = true;
+      }
+      saveData();
+      updateUI();
+    });
+
+    // チーム選択
+    document.querySelectorAll('[data-team]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-team]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedTeam = btn.dataset.team;
+        updateMemberSelect();
+      });
+    });
+
+    // 入力モード選択
+    document.querySelectorAll('[data-mode]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-mode]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        inputMode = btn.dataset.mode;
+        
+        const memberSelect = document.getElementById('memberSelect');
+        const memberInput = document.getElementById('memberInput');
+        const memberLabel = document.getElementById('memberLabel');
+        
+        if (inputMode === 'select') {
+          memberSelect.classList.remove('hidden');
+          memberInput.classList.add('hidden');
+          memberLabel.textContent = 'メンバーを選択';
+        } else {
+          memberSelect.classList.add('hidden');
+          memberInput.classList.remove('hidden');
+          memberLabel.textContent = '新しいメンバー名';
+        }
+      });
+    });
+
+    // 記録追加
+    document.getElementById('addRecord').addEventListener('click', () => {
+      const studyTime = parseInt(document.getElementById('studyTime').value);
+      
+      if (!studyTime || studyTime <= 0) {
+        alert('学習時間を入力してください(1以上の数値)');
+        return;
+      }
+
+      let memberName;
+      if (inputMode === 'new') {
+        memberName = document.getElementById('memberInput').value.trim();
+        if (!memberName) {
+          alert('名前を入力してください');
+          return;
+        }
+        if (!allMembers.find(m => m.name === memberName)) {
+          allMembers.push({ name: memberName, team: selectedTeam });
+        }
+      } else {
+        memberName = document.getElementById('memberSelect').value;
+        if (!memberName) {
+          alert('メンバーを選択してください');
+          return;
+        }
+      }
+
+      const teamKey = selectedTeam === 'team1' ? 'team1Members' : 'team2Members';
+      const existingMember = currentSession[teamKey].find(m => m.name === memberName);
+
+      if (existingMember) {
+        existingMember.time += studyTime;
+      } else {
+        currentSession[teamKey].push({ name: memberName, time: studyTime });
+      }
+
+      // フォームをリセット
+      document.getElementById('studyTime').value = '';
+      document.getElementById('memberInput').value = '';
+      document.getElementById('memberSelect').value = '';
+
+      saveData();
+      updateUI();
+    });
+  </script>
+</body>
+</html>
